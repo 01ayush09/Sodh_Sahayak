@@ -16,7 +16,7 @@
 
 ---
 
-## 📖 Overview
+##  Overview
 
 **Sodh Sahayak** is a production-minded implementation of the *"deep research agent"* pattern — the same category of system behind products like OpenAI's Deep Research or Perplexity's research mode — built entirely on **open, free-tier-friendly LLMs** (Groq and Mistral) and **LangGraph** as the agentic orchestration layer.
 
@@ -32,11 +32,10 @@ The result is a system that:
 
 ---
 
-## 🗺️ Architecture at a Glance
+##  Architecture at a Glance
 
-<div align="center">
-<img src="assets/architecture-overview.png" alt="Sodh Sahayak high-level architecture" width="850"/>
-</div>
+<img src="<img width="1024" height="1536" alt="architecture" src="https://github.com/user-attachments/assets/b94d8ed6-14a4-4eec-b28f-6fae604020b1" />
+
 
 The system is organized as three nested LangGraph `StateGraph`s:
 
