@@ -34,7 +34,7 @@ The result is a system that:
 
 ##  Architecture at a Glance
 
-<img src="<img width="1024" height="1536" alt="architecture" src="https://github.com/user-attachments/assets/b94d8ed6-14a4-4eec-b28f-6fae604020b1" />
+<img width="1024" height="1536" alt="architecture" src="https://github.com/user-attachments/assets/b94d8ed6-14a4-4eec-b28f-6fae604020b1" />
 
 
 The system is organized as three nested LangGraph `StateGraph`s:
@@ -47,13 +47,12 @@ The system is organized as three nested LangGraph `StateGraph`s:
 
 ### Full pipeline & data flow
 
-<div align="center">
-<img src="assets/pipeline-flow.png" alt="Detailed pipeline flow diagram" width="950"/>
-</div>
+<img width="7582" height="4280" alt="t" src="https://github.com/user-attachments/assets/72237bcc-973b-4d27-8f70-6e8e45bda56d" />
+
 
 ---
 
-## 🧠 How the Pipeline Works
+## How the Pipeline Works
 
 ### 1. Scoping (`scoping_nodes.py`, `scoping_graph.py`)
 | Node | Purpose |
@@ -80,9 +79,9 @@ A minimal ReAct loop per delegated topic: `llm_call → tool_node (Tavily search
 ### 4. Self-Correction ("Diffusion") Loop (`self_correction_nodes.py`)
 This is what elevates Sodh Sahayak beyond a typical search-augmented chatbot:
 
-- 🛡️ **Red Team Critic** — an adversarial LLM whose only goal is to find unsupported claims, logical leaps, and missing viewpoints in the current draft. Genuine issues get surfaced back to the supervisor as `CRITICAL INTERVENTION REQUIRED` system messages.
-- 📊 **Quality Evaluator** — an LLM-as-judge that scores comprehensiveness, accuracy/grounding, and coherence (0–10 each) with actionable, specific critique.
-- ✂️ **Context Pruner** — extracts atomic, **structured facts** (`Fact{content, source_url, confidence_score, is_disputed}`) from raw research notes, appends them to a durable knowledge base, and clears the temporary notes buffer. This is deliberate **context engineering**: the supervisor's working memory stays clean and fact-grounded instead of accumulating raw scratch text turn after turn.
+-  **Red Team Critic** — an adversarial LLM whose only goal is to find unsupported claims, logical leaps, and missing viewpoints in the current draft. Genuine issues get surfaced back to the supervisor as `CRITICAL INTERVENTION REQUIRED` system messages.
+-  **Quality Evaluator** — an LLM-as-judge that scores comprehensiveness, accuracy/grounding, and coherence (0–10 each) with actionable, specific critique.
+-  **Context Pruner** — extracts atomic, **structured facts** (`Fact{content, source_url, confidence_score, is_disputed}`) from raw research notes, appends them to a durable knowledge base, and clears the temporary notes buffer. This is deliberate **context engineering**: the supervisor's working memory stays clean and fact-grounded instead of accumulating raw scratch text turn after turn.
 
 Both the Red Team and Context Pruner run **in parallel** after each research step and feed back into the next supervisor turn — closing the loop.
 
@@ -91,15 +90,15 @@ Once the supervisor signals completion (or the iteration cap is hit), all curate
 
 ---
 
-## ✨ Key Engineering Highlights
+##  Key Engineering Highlights
 
-- **🎚️ Dual operating modes, tuned end-to-end** — `speed` mode (Groq, single researcher, no self-correction, ~15–20s) for demos, and `depth` mode (Mistral, parallel iterations, full Red Team + Judge + Pruner loop, ~60–90s) for genuinely thorough output. Every knob — concurrency, iteration caps, summarization char limits, writer token budgets — is re-tuned per mode in `config.py`.
-- **🔌 Provider-agnostic model layer** — swap between Groq (`llama-3.3-70b-versatile`) and Mistral (`mistral-large`/`mistral-small`) via a single env var, with per-provider call throttling to respect free-tier rate limits.
-- **♻️ Rate-limit-aware retry/backoff** — `utils.py` parses provider error strings (e.g. *"try again in 4.2s"*) to compute precise backoff windows, distinguishes retryable rate limits from unrecoverable quota exhaustion, and fails gracefully rather than looping forever.
-- **🧩 Structured, typed state everywhere** — every graph node reads/writes strongly-typed `TypedDict`/Pydantic state (`AgentState`, `SupervisorState`, `ResearcherState`, `Fact`, `Critique`, `QualityMetric`), keeping a complex multi-agent system auditable and easy to extend.
-- **🔐 Zero server-side key storage** — the FastAPI and Streamlit surfaces spawn an **isolated subprocess per request** (`worker.py`) with only that caller's API keys injected into its environment, so concurrent users' keys and quotas can never leak or collide.
-- **📏 Built-in evaluation harness** (`evaluate.py`) — runs fixed benchmark questions across provider/mode combinations, scores reports with a fixed independent judge model, and computes **self-consistency** across repeated runs (mean/median/stdev) rather than trusting a single n=1 result.
-- **🌐 Language-faithful by design** — every generation prompt explicitly instructs the model to respond in the same language as the user's original query.
+- ** Dual operating modes, tuned end-to-end** — `speed` mode (Groq, single researcher, no self-correction, ~15–20s) for demos, and `depth` mode (Mistral, parallel iterations, full Red Team + Judge + Pruner loop, ~60–90s) for genuinely thorough output. Every knob — concurrency, iteration caps, summarization char limits, writer token budgets — is re-tuned per mode in `config.py`.
+- ** Provider-agnostic model layer** — swap between Groq (`llama-3.3-70b-versatile`) and Mistral (`mistral-large`/`mistral-small`) via a single env var, with per-provider call throttling to respect free-tier rate limits.
+- ** Rate-limit-aware retry/backoff** — `utils.py` parses provider error strings (e.g. *"try again in 4.2s"*) to compute precise backoff windows, distinguishes retryable rate limits from unrecoverable quota exhaustion, and fails gracefully rather than looping forever.
+- ** Structured, typed state everywhere** — every graph node reads/writes strongly-typed `TypedDict`/Pydantic state (`AgentState`, `SupervisorState`, `ResearcherState`, `Fact`, `Critique`, `QualityMetric`), keeping a complex multi-agent system auditable and easy to extend.
+- ** Zero server-side key storage** — the FastAPI and Streamlit surfaces spawn an **isolated subprocess per request** (`worker.py`) with only that caller's API keys injected into its environment, so concurrent users' keys and quotas can never leak or collide.
+- ** Built-in evaluation harness** (`evaluate.py`) — runs fixed benchmark questions across provider/mode combinations, scores reports with a fixed independent judge model, and computes **self-consistency** across repeated runs (mean/median/stdev) rather than trusting a single n=1 result.
+- ** Language-faithful by design** — every generation prompt explicitly instructs the model to respond in the same language as the user's original query.
 
 ---
 
@@ -137,7 +136,7 @@ sodh-sahayak/
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Category | Technology |
 |---|---|
@@ -152,7 +151,7 @@ sodh-sahayak/
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### 1. Install dependencies
 
@@ -200,7 +199,7 @@ curl -X POST http://localhost:8000/research \
 
 ---
 
-## ⚙️ Configuration: Speed vs. Depth Mode
+##  Configuration: Speed vs. Depth Mode
 
 `RESEARCH_MODE` (auto-selected from `LLM_PROVIDER` if unset) controls a full set of tuned parameters:
 
@@ -213,13 +212,13 @@ curl -X POST http://localhost:8000/research \
 | Final writer token budget | 1,500 | 2,000 |
 | Red Team adversarial critique | ❌ off | ✅ on |
 | Context Pruner (fact extraction) | ❌ off | ✅ on |
-| Target latency | ~15–20s | ~60–90s |
+| Target latency | ~15–30s | ~90–120s |
 
 Both providers also get a small **pre-call pace limiter** (`LLM_CALL_THROTTLE_SECONDS`, `SUMMARIZE_THROTTLE_SECONDS`) tuned to their respective free-tier per-second limits.
 
 ---
 
-## 📊 Evaluation Harness
+##  Evaluation Harness
 
 `evaluate.py` benchmarks report quality *independently* of the model producing it:
 
@@ -234,7 +233,7 @@ python evaluate.py
 
 ---
 
-## 🔒 Deployment & Security Model
+##  Deployment & Security Model
 
 Full details live in [`DEPLOYMENT.md`](DEPLOYMENT.md). The short version:
 
@@ -244,7 +243,7 @@ Full details live in [`DEPLOYMENT.md`](DEPLOYMENT.md). The short version:
 
 ---
 
-## 🧭 Design Philosophy
+##  Design Philosophy
 
 Sodh Sahayak is deliberately built around a few core beliefs about agentic research systems:
 
